@@ -31,6 +31,7 @@ Server::Server()
 
 Server::~Server()
 {
+    service->stop();
     m_serviceThread.join();
 }
 
