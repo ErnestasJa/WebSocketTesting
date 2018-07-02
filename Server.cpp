@@ -1,5 +1,6 @@
 #include "Encoding.h"
 #include "Server.h"
+#include "proto/message.pb.h"
 #include <chrono>
 #include <cstring>
 #include <functional>
@@ -50,14 +51,12 @@ void Server::Run()
 	                  milliseconds(5000));
 
 	auto settings = make_shared<Settings>();
-	settings->set_port(1984);
+	settings->set_port(8082);
 	service->start(settings);
     };
 
     m_serviceThread = std::thread(thread_task);
 }
-
-void SendMessage(const std::string& msg);
 
 multimap<string, string> Server::build_websocket_handshake_response_headers(
     const shared_ptr<const Request>& request)
@@ -149,14 +148,6 @@ void Server::message_handler(const shared_ptr<WebSocket> source,
     }
 }
 
-void Server::SendMessage(const std::string& msg)
-{
-    for(auto socket_pair : this->sockets) {
-	auto socket = socket_pair.second;
-	socket->send(msg);
-    }
-}
-
 void Server::get_method_handler(const shared_ptr<Session> session)
 {
     const auto request = session->get_request();
@@ -176,15 +167,12 @@ void Server::get_method_handler(const shared_ptr<Session> session)
 		        socket->set_error_handler(f_error_handler);
 		        socket->set_message_handler(f_message_handler);
 
-		        socket->send(
-		            "Welcome to Corvusoft Chat!",
-		            [&](const shared_ptr<WebSocket> socket) {
-			        const auto key = socket->get_key();
-			        sockets.insert(make_pair(key, socket));
+                const auto key = socket->get_key( );
+                sockets.insert( make_pair( key, socket ) );
 
-			        fprintf(stderr, "Sent welcome message to %s.\n",
-			                key.data());
-		            });
+		        GreetMessage greetMessage;
+		        greetMessage.set_text("Hello from GreetMessage, your socket key: " + key);
+		        SendMessage(socket, greetMessage);
 		    } else {
 		        fprintf(stderr,
 		                "WebSocket Negotiation Failed: Client closed "

@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8.11)
 project(TestServer)
 
 # This setting is useful for providing JSON file used by CodeLite for code completion
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+#set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Set default locations
 set(CL_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../cmake-build-Debug/output)
@@ -47,7 +47,7 @@ string(STRIP ${CL_TMP_VAR} CL_VAR_1)
 add_definitions(${CL_VAR_1})
 add_definitions(-g)
 add_definitions(-Wall)
-add_definitions(-O0)
+#add_definitions(-O0)
 
 # Linker options
 execute_process(COMMAND 
@@ -64,19 +64,20 @@ if(WIN32)
 endif(WIN32)
 
 # Library path
-set(CMAKE_LDFLAGS "${CMAKE_LDFLAGS} -L. ")
+set(CMAKE_LDFLAGS "${CMAKE_LDFLAGS} -L. -L/usr/local/lib ")
 
 # Define the CXX sources
 set ( CXX_SRCS
-    ${CMAKE_CURRENT_LIST_DIR}/Encoding.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/mainwindow.cpp
     ${CMAKE_CURRENT_LIST_DIR}/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Server.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/proto/message.pb.cc
+    ${CMAKE_CURRENT_LIST_DIR}/mainwindow.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Encoding.cpp
 )
 
 set_source_files_properties(
     ${CXX_SRCS} PROPERTIES COMPILE_FLAGS 
-    " -g -Wall -O0 -pthread")
+    " -g -Wall -O0 -pthread ")
 
 if(WIN32)
     enable_language(RC)
@@ -94,7 +95,7 @@ add_executable(TestServer ${RC_SRCS} ${CXX_SRCS} ${C_SRCS})
 target_link_libraries(TestServer ${LINK_OPTIONS})
 
 target_link_libraries(TestServer
-    restbed ssl crypto pthread
+    restbed ssl crypto pthread protobuf
 )
 
 

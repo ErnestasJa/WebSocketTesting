@@ -1,0 +1,1 @@
+closure-compiler --js='**.js' --js_output_file='../js/*js'

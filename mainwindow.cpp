@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "proto/message.pb.h"
 #include <iostream>
 
 MainWindow::MainWindow()
@@ -30,6 +31,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_button_clicked()
 {
-    auto gs_message = m_entry.get_text();
-    m_server->SendMessage(gs_message.c_str());
+    game::GreetMessage greetMessage;
+    greetMessage.set_text(m_entry.get_text().c_str());
+    m_server->SendMessage(greetMessage);
 }
